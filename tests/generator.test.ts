@@ -69,6 +69,33 @@ describe('generator', async () => {
       }
     });
 
+    it('should generate CLAUDE.md with usage instructions', async () => {
+      const tempDir = await createTempDir();
+      try {
+        await createMockWorkspace({
+          root: tempDir,
+          packages: [testPackages.react],
+        });
+
+        await generate({
+          cwd: tempDir,
+          output: join(tempDir, '.claude/skills/v-skills'),
+        });
+
+        const claudeMdContent = await readFile(
+          join(tempDir, '.claude/skills/v-skills/CLAUDE.md'),
+          'utf-8'
+        );
+
+        assert.ok(claudeMdContent.includes('# v-skills Documentation'));
+        assert.ok(claudeMdContent.includes('check `_index.md` first'));
+        assert.ok(claudeMdContent.includes('Recommended Workflow'));
+        assert.ok(claudeMdContent.includes('descriptions and keywords'));
+      } finally {
+        await cleanupTempDir(tempDir);
+      }
+    });
+
     it('should filter to direct dependencies only with directOnly option', async () => {
       const tempDir = await createTempDir();
       try {

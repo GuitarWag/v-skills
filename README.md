@@ -61,7 +61,8 @@ npx v-skills --exclude "typescript,eslint*,@types/*,prettier"
 
 ```
 .claude/skills/v-skills/
-├── _index.md                    # Searchable index of all packages
+├── CLAUDE.md                    # Instructions for Claude Code AI
+├── _index.md                    # Searchable index with descriptions & keywords
 ├── react/
 │   └── SKILL.md
 ├── express/
@@ -72,6 +73,8 @@ npx v-skills --exclude "typescript,eslint*,@types/*,prettier"
     └── query/
         └── SKILL.md             # Scoped packages preserve structure
 ```
+
+The `CLAUDE.md` file instructs Claude Code to check the `_index.md` first before opening individual SKILL.md files, improving efficiency when working with projects that have many dependencies.
 
 ### Example SKILL.md
 
