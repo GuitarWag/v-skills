@@ -168,7 +168,7 @@ v-skills works out of the box, but you can customize it.
 npx v-skills init
 ```
 
-Creates `v-skills.config.js`:
+Creates `v-skills.config.mjs`:
 
 ```js
 /** @type {import('v-skills').VSkillsConfig} */
@@ -198,7 +198,7 @@ export default {
 
 v-skills automatically detects (in order):
 
-1. `v-skills.config.js` / `.mjs` / `.cjs`
+1. `v-skills.config.mjs` / `.js` / `.cjs`
 2. `v-skills.config.json`
 3. `v-skills.config.yaml` / `.yml`
 4. `package.json` → `"vskills"` field

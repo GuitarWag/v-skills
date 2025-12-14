@@ -299,6 +299,96 @@ describe('generator', async () => {
         await cleanupTempDir(tempDir);
       }
     });
+
+    it('should clean output directory before regenerating', async () => {
+      const tempDir = await createTempDir();
+      try {
+        const outputDir = join(tempDir, '.claude/skills/v-skills');
+
+        // First generation with all packages
+        await createMockWorkspace({
+          root: tempDir,
+          packages: [testPackages.react, testPackages.express, testPackages.zod],
+        });
+
+        await generate({ cwd: tempDir, output: outputDir });
+
+        // Verify all packages exist
+        let files = await readdir(outputDir);
+        assert.ok(files.includes('react'));
+        assert.ok(files.includes('express'));
+        assert.ok(files.includes('zod'));
+
+        // Second generation with only react (excluding others)
+        await generate({
+          cwd: tempDir,
+          output: outputDir,
+          include: ['react'],
+        });
+
+        // Verify stale packages (express, zod) are removed
+        files = await readdir(outputDir);
+        assert.ok(files.includes('react'));
+        assert.ok(!files.includes('express'));
+        assert.ok(!files.includes('zod'));
+      } finally {
+        await cleanupTempDir(tempDir);
+      }
+    });
+
+    it('should remove stale packages when config changes', async () => {
+      const tempDir = await createTempDir();
+      try {
+        const outputDir = join(tempDir, '.claude/skills/v-skills');
+
+        await createMockWorkspace({
+          root: tempDir,
+          packages: [testPackages.react, testPackages.express],
+        });
+
+        // First run - generate both
+        const result1 = await generate({ cwd: tempDir, output: outputDir });
+        assert.strictEqual(result1.skills.length, 2);
+
+        // Second run - exclude express
+        const result2 = await generate({
+          cwd: tempDir,
+          output: outputDir,
+          exclude: ['express'],
+        });
+        assert.strictEqual(result2.skills.length, 1);
+
+        // Verify express folder is gone
+        const files = await readdir(outputDir);
+        assert.ok(!files.includes('express'));
+      } finally {
+        await cleanupTempDir(tempDir);
+      }
+    });
+
+    it('should handle non-existent output directory on first run', async () => {
+      const tempDir = await createTempDir();
+      try {
+        await createMockWorkspace({
+          root: tempDir,
+          packages: [testPackages.react],
+        });
+
+        // Output dir doesn't exist yet
+        const outputDir = join(tempDir, 'brand-new-directory/skills');
+
+        // Should create directory and generate
+        const result = await generate({ cwd: tempDir, output: outputDir });
+
+        assert.strictEqual(result.skills.length, 1);
+
+        // Verify directory was created
+        const files = await readdir(outputDir);
+        assert.ok(files.includes('react'));
+      } finally {
+        await cleanupTempDir(tempDir);
+      }
+    });
   });
 
   describe('clean', async () => {

@@ -26,7 +26,8 @@ Options:
   --no-config         Ignore config file
 
 Config Files (auto-detected):
-  v-skills.config.js    JavaScript/ESM config
+  v-skills.config.mjs   JavaScript/ESM config
+  v-skills.config.js    JavaScript config
   v-skills.config.json  JSON config
   v-skills.config.yaml  YAML config
   package.json          "vskills" field
@@ -153,10 +154,10 @@ async function main(): Promise<void> {
       case 'init': {
         const { writeFile } = await import('node:fs/promises');
         const { join } = await import('node:path');
-        const configPath = join(cwd, 'v-skills.config.js');
+        const configPath = join(cwd, 'v-skills.config.mjs');
 
         await writeFile(configPath, CONFIG_TEMPLATE);
-        console.log(`\n✓ Created v-skills.config.js\n`);
+        console.log(`\n✓ Created v-skills.config.mjs\n`);
         break;
       }
 

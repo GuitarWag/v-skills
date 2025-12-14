@@ -5,8 +5,8 @@ import type { VSkillsConfig } from './types.js';
 import { fileExists } from './utils.js';
 
 const CONFIG_FILES = [
-  'v-skills.config.js',
   'v-skills.config.mjs',
+  'v-skills.config.js',
   'v-skills.config.cjs',
   'v-skills.config.json',
   'v-skills.config.yaml',

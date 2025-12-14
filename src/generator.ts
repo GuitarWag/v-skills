@@ -45,6 +45,9 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
   const cwd = options.cwd || process.cwd();
   const outputDir = options.output || join(cwd, DEFAULT_OUTPUT);
 
+  // Clean output directory to remove stale files
+  await rm(outputDir, { recursive: true, force: true });
+
   // Ensure output directory exists
   await mkdir(outputDir, { recursive: true });
 

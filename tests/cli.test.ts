@@ -288,4 +288,77 @@ describe('CLI', async () => {
       }
     });
   });
+
+  describe('init command', async () => {
+    it('should create v-skills.config.mjs file', async () => {
+      const tempDir = await createTempDir();
+      try {
+        const { code, stdout } = await runCli(['init', '--cwd', tempDir]);
+
+        assert.strictEqual(code, 0);
+        assert.ok(stdout.includes('Created v-skills.config.mjs'));
+
+        // Verify file exists
+        const configPath = join(tempDir, 'v-skills.config.mjs');
+        let exists = true;
+        try {
+          await access(configPath);
+        } catch {
+          exists = false;
+        }
+        assert.ok(exists);
+
+        // Verify content
+        const { readFile } = await import('node:fs/promises');
+        const content = await readFile(configPath, 'utf-8');
+        assert.ok(content.includes('export default'));
+        assert.ok(content.includes('VSkillsConfig'));
+        assert.ok(content.includes('exclude'));
+      } finally {
+        await cleanupTempDir(tempDir);
+      }
+    });
+
+    it('should create config with default template content', async () => {
+      const tempDir = await createTempDir();
+      try {
+        await runCli(['init', '--cwd', tempDir]);
+
+        const { readFile } = await import('node:fs/promises');
+        const configPath = join(tempDir, 'v-skills.config.mjs');
+        const content = await readFile(configPath, 'utf-8');
+
+        // Check for key template elements
+        assert.ok(content.includes('@types/*'));
+        assert.ok(content.includes('typescript'));
+        assert.ok(content.includes('eslint*'));
+        assert.ok(content.includes('prettier'));
+        assert.ok(content.includes('directOnly'));
+        assert.ok(content.includes('include'));
+        assert.ok(content.includes('output'));
+      } finally {
+        await cleanupTempDir(tempDir);
+      }
+    });
+
+    it('should work with init as standalone command', async () => {
+      const tempDir = await createTempDir();
+      try {
+        const { code } = await runCli(['init', '--cwd', tempDir]);
+
+        assert.strictEqual(code, 0);
+
+        const configPath = join(tempDir, 'v-skills.config.mjs');
+        let exists = true;
+        try {
+          await access(configPath);
+        } catch {
+          exists = false;
+        }
+        assert.ok(exists);
+      } finally {
+        await cleanupTempDir(tempDir);
+      }
+    });
+  });
 });

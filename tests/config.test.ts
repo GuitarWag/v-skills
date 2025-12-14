@@ -105,6 +105,94 @@ directOnly: true
       }
     });
 
+    it('should load MJS config (ESM)', async () => {
+      const tempDir = await createTempDir();
+      try {
+        await writeFile(
+          join(tempDir, 'v-skills.config.mjs'),
+          `export default {
+  exclude: ['@types/*'],
+  directOnly: true,
+  output: 'custom-output',
+};`
+        );
+
+        const config = await loadConfig(tempDir);
+
+        assert.ok(config);
+        assert.deepStrictEqual(config.exclude, ['@types/*']);
+        assert.strictEqual(config.directOnly, true);
+        assert.strictEqual(config.output, 'custom-output');
+      } finally {
+        await cleanupTempDir(tempDir);
+      }
+    });
+
+    it('should prioritize .mjs over .js when both exist', async () => {
+      const tempDir = await createTempDir();
+      try {
+        // Create .js config
+        await writeFile(
+          join(tempDir, 'v-skills.config.js'),
+          `export default {
+  exclude: ['from-js-config'],
+};`
+        );
+
+        // Create .mjs config
+        await writeFile(
+          join(tempDir, 'v-skills.config.mjs'),
+          `export default {
+  exclude: ['from-mjs-config'],
+};`
+        );
+
+        const config = await loadConfig(tempDir);
+
+        assert.ok(config);
+        // Should use .mjs, not .js
+        assert.deepStrictEqual(config.exclude, ['from-mjs-config']);
+      } finally {
+        await cleanupTempDir(tempDir);
+      }
+    });
+
+    it('should prioritize .mjs over other formats', async () => {
+      const tempDir = await createTempDir();
+      try {
+        // Create JSON config
+        await writeFile(
+          join(tempDir, 'v-skills.config.json'),
+          JSON.stringify({
+            exclude: ['from-json'],
+          })
+        );
+
+        // Create YAML config
+        await writeFile(
+          join(tempDir, 'v-skills.config.yaml'),
+          `exclude:
+  - from-yaml`
+        );
+
+        // Create .mjs config
+        await writeFile(
+          join(tempDir, 'v-skills.config.mjs'),
+          `export default {
+  exclude: ['from-mjs'],
+};`
+        );
+
+        const config = await loadConfig(tempDir);
+
+        assert.ok(config);
+        // Should use .mjs, not JSON or YAML
+        assert.deepStrictEqual(config.exclude, ['from-mjs']);
+      } finally {
+        await cleanupTempDir(tempDir);
+      }
+    });
+
     it('should load config from package.json vskills field', async () => {
       const tempDir = await createTempDir();
       try {
