@@ -1,6 +1,6 @@
 {
   "name": "v-skills",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Auto-generate AI agent skills from node_modules READMEs",
   "type": "module",
   "main": "dist/index.js",
