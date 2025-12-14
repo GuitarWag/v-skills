@@ -26,3 +26,6 @@ yarn-error.log*
 
 # Test coverage
 coverage/
+
+# NPM authentication (if using local .npmrc with token)
+.npmrc
